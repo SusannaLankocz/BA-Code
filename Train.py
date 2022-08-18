@@ -92,10 +92,10 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
         loop.set_postfix(A_real=A_reals / (idx + 1), A_fake=A_fakes / (idx + 1))
 
 def main():
-    disc_A = Discriminator(in_channels=3).to(config.DEVICE)  # classify images of Abstract images
-    disc_P = Discriminator(in_channels=3).to(config.DEVICE)  # discriminates if its a real portrait or a fake (abstract) portrait
-    gen_A = Generator(img_channels=3, num_residuals=9).to(config.DEVICE)  # generates an abstract image
-    gen_P = Generator(img_channels=3, num_residuals=9).to(config.DEVICE)  # takes in an image (abstract) and generates an portrait image
+    disc_A = Discriminator(3).to(config.DEVICE)  # classify images of Abstract images
+    disc_P = Discriminator(3).to(config.DEVICE)  # discriminates if its a real portrait or a fake (abstract) portrait
+    gen_A = Generator(3, 9).to(config.DEVICE)  # generates an abstract image
+    gen_P = Generator(3, 9).to(config.DEVICE)  # takes in an image (abstract) and generates an portrait image
 
     disc_A.apply(weights_init_normal)
     disc_P.apply(weights_init_normal)

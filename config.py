@@ -23,7 +23,7 @@ CHECKPOINT_DISC_P = "output/netD_P.pth"
 transforms = A.Compose(
     [
         A.Resize(width=256, height=256),
-        A.RandomCrop(256),
+        A.RandomCrop(256, 256),
         A.HorizontalFlip(p=0.5),
         A.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1, always_apply=False, p=0.1),
         A.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], max_pixel_value=255),
