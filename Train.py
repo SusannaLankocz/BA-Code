@@ -84,11 +84,7 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
 
             opt_gen.step()
 
-            # Progress report (http://localhost:8097)
-            logger.log({'loss_G': G_loss, 'loss_G_identity': (identity_abstract_loss + identity_portrait_loss),
-                        'loss_G_GAN': (loss_G_A + loss_G_P),
-                        'loss_G_cycle': (cycle_abstract_loss * config.LAMBDA_CYCLE + cycle_portrait_loss * config.LAMBDA_CYCLE), 'loss_D': (D_loss)},
-                       images={'real_A': abstract, 'real_B': portrait, 'fake_A': fake_abstract, 'fake_B': fake_portrait})
+
 
         g_scaler.scale(G_loss).backward()
         g_scaler.step(opt_gen)
@@ -99,6 +95,14 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
             save_image(fake_abstract*0.5+0.5, f"saved_images/abstract_{idx}.png")
 
         loop.set_postfix(A_real=A_reals / (idx + 1), A_fake=A_fakes / (idx + 1))
+
+        # Progress report (http://localhost:8097)
+        logger.log({'loss_G': G_loss, 'loss_G_identity': (identity_abstract_loss + identity_portrait_loss),
+                    'loss_G_GAN': (loss_G_A + loss_G_P),
+                    'loss_G_cycle': (
+                                cycle_abstract_loss * config.LAMBDA_CYCLE + cycle_portrait_loss * config.LAMBDA_CYCLE),
+                    'loss_D': (D_loss)},
+                   images={'real_AbstractPainting': abstract, 'real_Portrait': portrait, 'fake_AbstractPainting': fake_abstract, 'fake_Portrait': fake_portrait})
 
 def main():
     disc_A = Discriminator(3).to(config.DEVICE)  # classify images of Abstract images
