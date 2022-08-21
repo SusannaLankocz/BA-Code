@@ -1,4 +1,5 @@
 import torch
+import itertools
 from Dataset import AbstractPortraitDataset
 from torch.utils.data import DataLoader
 import torch.nn as nn
@@ -8,9 +9,11 @@ from tqdm import tqdm
 from torchvision.utils import save_image
 from Discriminator import Discriminator
 from Generator import Generator
-from utils import LambdaLR, weights_init_normal
+from utils import LambdaLR, weights_init_normal, Logger
+from PIL import Image
 
-def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler):
+
+def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler, logger):
     A_reals = 0
     A_fakes = 0
 
@@ -80,6 +83,12 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
             )
 
             opt_gen.step()
+
+            # Progress report (http://localhost:8097)
+            logger.log({'loss_G': G_loss, 'loss_G_identity': (identity_abstract_loss + identity_portrait_loss),
+                        'loss_G_GAN': (loss_G_A + loss_G_P),
+                        'loss_G_cycle': (cycle_abstract_loss * config.LAMBDA_CYCLE + cycle_portrait_loss * config.LAMBDA_CYCLE), 'loss_D': (D_loss)},
+                       images={'real_A': abstract, 'real_B': portrait, 'fake_A': fake_abstract, 'fake_B': fake_portrait})
 
         g_scaler.scale(G_loss).backward()
         g_scaler.step(opt_gen)
@@ -152,12 +161,15 @@ def main():
         pin_memory=True
     )
 
+    # Loss plot
+    logger = Logger(config.NUM_EPOCHS, len(loader))
+
     # float 16 training, ohne in float 32
     g_scaler = torch.cuda.amp.GradScaler()
     d_scaler = torch.cuda.amp.GradScaler()
 
     for epoch in range(config.NUM_EPOCHS):
-        train(disc_A, disc_P, gen_P, gen_A, loader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler)
+        train(disc_A, disc_P, gen_P, gen_A, loader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler, logger)
 
         """ HIER NOCH UPDATE LEARNING RATES ODER NICHT NOTWENDIG ?"""
 

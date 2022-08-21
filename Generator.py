@@ -8,15 +8,11 @@ class ResNetBlock(nn.Module):
     def __init__(self, in_features):
         super(ResNetBlock, self).__init__()
 
-        conv_block = [nn.ReflectionPad2d(1),
-                      nn.Conv2d(in_features, in_features, kernel_size=3, padding=1),
-                      nn.InstanceNorm2d(in_features),
-                      nn.ReLU(inplace=True),
-                      nn.ReflectionPad2d(1),
-                      nn.Conv2d(in_features, in_features, 3),
-                      nn.InstanceNorm2d(in_features)]
+        self.conv_block = nn.Sequential(
+            ConvBlock(in_features, in_features, kernel_size=3, padding=1),
+            ConvBlock(in_features, in_features, use_act=False, kernel_size=3, padding=1),
+        )
 
-        self.conv_block = nn.Sequential(*conv_block)
     """ forward function with skip connections """
     def forward(self, x):
         return x + self.conv_block(x)
