@@ -17,54 +17,107 @@ class ResNetBlock(nn.Module):
                       nn.InstanceNorm2d(in_features)]
 
         self.conv_block = nn.Sequential(*conv_block)
-
     """ forward function with skip connections """
     def forward(self, x):
         return x + self.conv_block(x)
 
 
+class ConvBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, down=True, use_act=True, **kwargs):
+        super(ConvBlock, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, padding_mode="reflect", **kwargs)
+            if down
+            else nn.ConvTranspose2d(in_channels, out_channels, **kwargs),
+            nn.InstanceNorm2d(out_channels),
+            nn.ReLU(inplace=True) if use_act else nn.Identity()
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
 
 class Generator(nn.Module):
-    def __init__(self, n_input, n_output, n_resnet_blocks=9):
-        super(Generator, self).__init__()
+     def __init__(self, img_channels, num_features=64, num_resnet=9):
+         super(Generator, self).__init__()
+         self.initial = nn.Sequential(
+             nn.Conv2d(img_channels, num_features, kernel_size=7, stride=1, padding=3, padding_mode="reflect"),
+             nn.InstanceNorm2d(num_features),
+             nn.ReLU(inplace=True),
+         )
+         self.down_blocks = nn.ModuleList(
+             [
+                 ConvBlock(num_features, num_features * 2, kernel_size=3, stride=2, padding=1),
+                 ConvBlock(num_features * 2, num_features * 4, kernel_size=3, stride=2, padding=1)
+             ]
+         )
+         self.res_blocks = nn.Sequential(
+             *[ResNetBlock(num_features * 4) for _ in range(num_resnet)]
+         )
+         self.up_blocks = nn.ModuleList(
+             [
+                 ConvBlock(num_features * 4, num_features * 2, down=False, kernel_size=3, stride=2, padding=1,
+                           output_padding=1),
+                 ConvBlock(num_features * 2, num_features * 1, down=False, kernel_size=3, stride=2, padding=1,
+                           output_padding=1)
+             ]
+         )
 
-        """ Initial conv block"""
-        model = [nn.ReflectionPad2d(3),
-                 nn.Conv2d(n_input, 64, kernel_size=7),
-                 nn.InstanceNorm2d(64),
-                 nn.ReLU(True)]
+         self.last = nn.Conv2d(num_features * 1, img_channels, kernel_size=7, stride=1, padding=3,
+                               padding_mode="reflect")
 
-        """ Add Downsampling layers"""
-        in_features = 64
-        out_features = in_features * 2
-        for _ in range(2):
-            model += [nn.Conv2d(in_features, out_features, kernel_size=3, stride=2, padding=1),
-                      nn.InstanceNorm2d(out_features),
-                      nn.ReLU(True)]
-            in_features = out_features
-            out_features = in_features * 2
+         def forward(self, x):
+             x = self.initial(x)
+             for layer in self.down_blocks:
+                 x = layer(x)
+             x = self.res_blocks(x)
+             for layer in self.up_blocks:
+                 x = layer(x)
+             # convert to rgb
+             return torch.tanh(self.last(x))
 
-        """ Add ResNet blocks"""
-        for _ in range(n_resnet_blocks):
-            model += [ResNetBlock(in_features)]
+         #     def __init__(self, n_input, n_output, n_resnet_blocks=9):
+#         super(Generator, self).__init__()
+#
+#         """ Initial conv block"""
+#         model = [nn.ReflectionPad2d(3),
+#                  nn.Conv2d(n_input, 64, kernel_size=7),
+#                  nn.InstanceNorm2d(64),
+#                  nn.ReLU(True)]
+#
+#         """ Add Downsampling layers"""
+#         in_features = 64
+#         out_features = in_features * 2
+#         for _ in range(2):
+#             model += [nn.Conv2d(in_features, out_features, kernel_size=3, stride=2, padding=1),
+#                       nn.InstanceNorm2d(out_features),
+#                       nn.ReLU(True)]
+#             in_features = out_features
+#             out_features = in_features * 2
+#
+#         """ Add ResNet blocks"""
+#         for _ in range(n_resnet_blocks):
+#             model += [ResNetBlock(in_features)]
+#
+#         """ Add Upsampling layers"""
+#         out_features = in_features//2
+#         for _ in range(2):
+#             model += [nn.ConvTranspose2d(in_features, out_features, kernel_size=3, stride=2, padding=1, output_padding=1),
+#                       nn.InstanceNorm2d(out_features),
+#                       nn.ReLU(True)]
+#             in_features = out_features
+#             out_features = in_features//2
+#
+#             """ Output Layer"""
+#             model += [nn.ReflectionPad2d(3)]
+#             model += [nn.Conv2d(64, n_output, kernel_size=7, padding=0)]
+#             model += [nn.Tanh()]
+#
+#             self.model = nn.Sequential(*model)
 
-        """ Add Upsampling layers"""
-        out_features = in_features//2
-        for _ in range(2):
-            model += [nn.ConvTranspose2d(in_features, out_features, kernel_size=3, stride=2, padding=1, output_padding=1),
-                      nn.InstanceNorm2d(out_features),
-                      nn.ReLU(True)]
-            in_features = out_features
-            out_features = in_features//2
+        # def forward(self, x):
+        #     x = self.initial(x)
+        #     # convert to rgb
+        #     return torch.tanh(self.last(x))
 
-            """ Output Layer"""
-            model += [nn.ReflectionPad2d(3)]
-            model += [nn.Conv2d(64, n_output, kernel_size=7, padding=0)]
-            model += [nn.Tanh()]
 
-            self.model = nn.Sequential(*model)
-
-        def forward(self, x):
-            x = self.initial(x)
-            # convert to rgb
-            return torch.tanh(self.last(x))
