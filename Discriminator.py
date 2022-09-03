@@ -4,7 +4,6 @@ import torch.nn.functional as F
 
 """ PatchGAN Discriminator """
 
-
 class Discriminator(nn.Module):
     def __init__(self, n_input):
         super(Discriminator, self).__init__()

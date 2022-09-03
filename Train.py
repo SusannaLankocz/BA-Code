@@ -8,7 +8,7 @@ from tqdm import tqdm
 from torchvision.utils import save_image
 from Discriminator import Discriminator
 from Generator import Generator
-from utils import LambdaLR, weights_init_normal
+from utils import weights_init_normal
 
 def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler):
     A_reals = 0
@@ -63,7 +63,6 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
             cycle_abstract_loss = l1(abstract, cycle_abstract)
             cycle_portrait_loss = l1(portrait, cycle_portrait)
 
-            # identity loss, da config.LAMBDA_IDENTITY = 0, ist der Code unnötig, identity kann man weglassen
             identity_abstract = gen_A(abstract)
             identity_portrait = gen_P(portrait)
             identity_abstract_loss = l1(abstract, identity_abstract)
@@ -115,14 +114,6 @@ def main():
         betas=(0.5, 0.999),
     )
 
-    """ LR Schedulers Notwendig ?"""
-    # lr_scheduler_G = torch.optim.lr_scheduler.LambdaLR(opt_gen,
-    #                                                    lr_lambda=LambdaLR(config.NUM_EPOCHS, epoch,
-    #                                                                       opt.decay_epoch).step)
-    # lr_scheduler_D = torch.optim.lr_scheduler.LambdaLR(opt_disc,
-    #                                                      lr_lambda=LambdaLR(opt.n_epochs, opt.epoch,
-    #                                                                         opt.decay_epoch).step)
-
     l1 = nn.L1Loss()  # cycle consistency loss and identity loss
     mse = nn.MSELoss()  # mean squared error
 
@@ -158,9 +149,6 @@ def main():
 
     for epoch in range(config.NUM_EPOCHS):
         train(disc_A, disc_P, gen_P, gen_A, loader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler)
-
-        """ HIER NOCH UPDATE LEARNING RATES ODER NICHT NOTWENDIG ?"""
-
 
         """ Save models checkpoints"""
         torch.save(disc_A.state_dict(), 'network-output/disc_A.pth')
