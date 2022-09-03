@@ -7,7 +7,7 @@ TRAIN_DIR = "datasets/train"
 VAL_DIR = "datasets/test"
 BATCH_SIZE = 1
 LEARNING_RATE = 1e-5
-LAMBDA_IDENTITY = 0.0
+LAMBDA_IDENTITY = 0.5
 LAMBDA_CYCLE = 10
 NUM_WORKERS = 4
 # 150 Epochs oder mehr um ideale Bilder zu kriegen
