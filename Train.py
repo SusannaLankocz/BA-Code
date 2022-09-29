@@ -10,7 +10,6 @@ from torchvision.utils import save_image
 from Discriminator import Discriminator
 from Generator import Generator
 from utils import weights_init_normal
-from torch.utils.tensorboard import SummaryWriter
 
 def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler):
     A_reals = 0
@@ -137,18 +136,9 @@ def main():
         pin_memory=True
     )
 
-    # NOTWENDIG ?
-    val_loader = DataLoader(
-        val_dataset,
-        batch_size=1,
-        shuffle=False,
-        pin_memory=True
-    )
-
     # float 16 training, ohne in float 32
     g_scaler = torch.cuda.amp.GradScaler()
     d_scaler = torch.cuda.amp.GradScaler()
-    writer = SummaryWriter()
 
     for epoch in range(config.NUM_EPOCHS):
         train(disc_A, disc_P, gen_P, gen_A, loader, opt_disc, opt_gen, l1, mse, d_scaler, g_scaler)
@@ -158,11 +148,6 @@ def main():
         torch.save(disc_P.state_dict(), 'network-output/disc_P.pth')
         torch.save(gen_A.state_dict(), 'network-output/gen_A.pth')
         torch.save(gen_P.state_dict(), 'network-output/gen_P.pth')
-
-        writer.add_scalar('Loss/train', np.random.random(), epoch)
-        writer.add_scalar('Loss/test', np.random.random(), epoch)
-        writer.add_scalar('Accuracy/train', np.random.random(), epoch)
-        writer.add_scalar('Accuracy/test', np.random.random(), epoch)
 
 if __name__ == "__main__":
     main()

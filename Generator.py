@@ -61,7 +61,6 @@ class Generator(nn.Module):
                            output_padding=1)
              ]
          )
-
          self.last = nn.Conv2d(num_features * 1, img_channels, kernel_size=7, stride=1, padding=3,
                                padding_mode="reflect")
 
