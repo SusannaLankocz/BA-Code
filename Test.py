@@ -11,9 +11,6 @@ import config
 gen_A = Generator(3, 9).to(config.DEVICE)  # generates an abstract image
 gen_P = Generator(3, 9).to(config.DEVICE)  # takes in an image (abstract) and generates an portrait image
 
-torch.load(gen_A.state_dict(), 'network-output/gen_A.pth')
-torch.load(gen_P.state_dict(), 'network-output/gen_P.pth')
-
 gen_A.load_state_dict(torch.load('network-output/gen_A.pth'))
 gen_P.load_state_dict(torch.load('network-output/gen_P.pth'))
 
@@ -33,12 +30,6 @@ val_loader = DataLoader(
     )
 
 ###### Testing######
-
-# Create output dirs if they don't exist
-if not os.path.exists('output/A'):
-    os.makedirs('output/TestAbstract')
-if not os.path.exists('output/B'):
-    os.makedirs('output/TestPortraits')
 
 for i, (abstract, portrait) in enumerate(val_loader):
     abstract = abstract.to(config.DEVICE)
