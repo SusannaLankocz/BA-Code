@@ -123,11 +123,6 @@ def main():
         root_portrait="datasets/train/P", transform=config.transforms
     )
 
-    val_dataset = AbstractPortraitDataset(
-        root_abstract="datasets/test/A",
-        root_portrait="datasets/test/P", transform=config.transforms
-    )
-
     loader = DataLoader(
         train_dataset,
         batch_size=config.BATCH_SIZE,
