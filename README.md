@@ -1,4 +1,4 @@
-###### Prototyp-Implementierung für meine Bachelorarbeit ######
+#### Prototyp-Implementierung für meine Bachelorarbeit 
 
 Code meiner Bachelorarbeit mit dem Titel "Implementierung und Validierung von computergenerierten
 abstrakten Portraits mithilfe von CycleGANs" im Studiengang Media Engineering.
