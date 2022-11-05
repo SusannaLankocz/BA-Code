@@ -1,6 +1,5 @@
 import torch
 import sys
-import os
 from Dataset import AbstractPortraitDataset
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
@@ -29,7 +28,7 @@ val_loader = DataLoader(
         pin_memory=True,
     )
 
-###### Testing######
+###### Testing ######
 
 for i, (abstract, portrait) in enumerate(val_loader):
     abstract = abstract.to(config.DEVICE)
@@ -44,6 +43,3 @@ for i, (abstract, portrait) in enumerate(val_loader):
     save_image(fake_portrait, 'output/B/%04d.png' % (i+1))
 
     sys.stdout.write('\rGenerated images %04d of %04d' % (i+1, len(val_loader)))
-
-sys.stdout.write('\n')
-###################################

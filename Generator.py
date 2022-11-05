@@ -2,7 +2,6 @@ import torch
 import torch.nn as nn
 
 """ Resnet Generator """
-
 class ResNetBlock(nn.Module):
     def __init__(self, in_features):
         super(ResNetBlock, self).__init__()

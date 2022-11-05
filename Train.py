@@ -1,5 +1,4 @@
-import torch, numpy as np
-import torchvision
+import torch
 from Dataset import AbstractPortraitDataset
 from torch.utils.data import DataLoader
 import torch.nn as nn
@@ -15,7 +14,8 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
     A_reals = 0
     A_fakes = 0
 
-    loop = tqdm(dataloader, leave=True) # progress bar
+    # progress bar
+    loop = tqdm(dataloader, leave=True)
 
     for idx, (abstract, portrait) in enumerate(loop):
         abstract = abstract.to(config.DEVICE)
@@ -75,8 +75,8 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
                     + loss_G_P
                     + cycle_abstract_loss * config.LAMBDA_CYCLE
                     + cycle_portrait_loss * config.LAMBDA_CYCLE
-                    + identity_abstract_loss * config.LAMBDA_IDENTITY  # oder
-                    + identity_portrait_loss * config.LAMBDA_IDENTITY  # andersum?
+                    + identity_abstract_loss * config.LAMBDA_IDENTITY
+                    + identity_portrait_loss * config.LAMBDA_IDENTITY
             )
 
             opt_gen.step()
@@ -86,7 +86,6 @@ def train(disc_A, disc_P, gen_A, gen_P, dataloader, opt_disc, opt_gen, l1, mse, 
         g_scaler.update()
 
         if idx % 200 == 0:
-            # *0.5+0.5 = Inverse of the normalization to get the correct coloring
             save_image(fake_abstract*0.5+0.5, f"saved_images/abstract_{idx}.png")
 
         loop.set_postfix(A_real=A_reals / (idx + 1), A_fake=A_fakes / (idx + 1))
@@ -106,7 +105,7 @@ def main():
     opt_disc = optim.Adam(
         list(disc_A.parameters()) + list(disc_P.parameters()),
         lr=config.LEARNING_RATE,
-        betas=(0.5, 0.999),  # 0.5 for the momentum turn and 0.999 for beta2
+        betas=(0.5, 0.999),
     )
 
     opt_gen = optim.Adam(
@@ -131,7 +130,6 @@ def main():
         pin_memory=True
     )
 
-    # float 16 training, ohne in float 32
     g_scaler = torch.cuda.amp.GradScaler()
     d_scaler = torch.cuda.amp.GradScaler()
 

@@ -10,7 +10,6 @@ LEARNING_RATE = 1e-5
 LAMBDA_IDENTITY = 0.5
 LAMBDA_CYCLE = 10
 NUM_WORKERS = 4
-# 150 Epochs oder mehr um ideale Bilder zu kriegen
 NUM_EPOCHS = 150
 LOAD_MODEL = True
 SAVE_MODEL = True
@@ -19,7 +18,6 @@ CHECKPOINT_GEN_P = "output/netG_P2A.pth"
 CHECKPOINT_DISC_A = "output/netD_A.pth"
 CHECKPOINT_DISC_P = "output/netD_P.pth"
 
-#Use albumentations to define augmentation pipelines for training and val datasets.
 transforms = A.Compose(
     [
         A.Resize(width=256, height=256),

@@ -1,10 +1,6 @@
-import random, torch, os, numpy as np
-import torch.nn as nn
-import config
-import copy
-from torch.autograd import Variable
+import torch
 
-""" To initialize weights of a network. """
+""" weights of a network. """
 def weights_init_normal(m):
    classname = m.__class__.__name__
    if classname.find('Conv2d') != -1:
