@@ -19,7 +19,11 @@ Die Implementierung des Prototypen ist in Python geschrieben und benutzt das Fra
 1. Sicherstellen, dass Python, PyTorch und Cuda installiert ist. 
 2. Repo klonen  
 3. Einen Ordner namens "saved_images" erstellen in der gleichen Hierarchie, wie alle Dateien.
-4. Code ausführen mit python3 Train.py --dataroot datasets/ --cuda
+4. Datensatz-Ordner mit den folgenden Ordnern erstellen und Bilder in jeweils "A" und "P" hinzufügen:
+   "datasets" --> "train" --> "A" und "P" 
+              --> "test"  --> "A" und "P" 
+    oder mich nach den Datensatz-Bildern fragen
+6. Code ausführen mit python3 Train.py --dataroot datasets/ --cuda
 
 
 ## Github-Repository Quellen 
@@ -29,6 +33,8 @@ https://github.com/junyanz/CycleGAN
 https://github.com/aladdinpersson/Machine-Learning-Collection/tree/master/ML/Pytorch/GANs/CycleGAN
 
 https://github.com/aitorzip/PyTorch-CycleGAN
+
+
 
 
 ~ Susanna Lankocz
