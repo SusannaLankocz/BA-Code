@@ -25,7 +25,9 @@ Die Implementierung des Prototypen ist in Python geschrieben und benutzt das Fra
 ## Github-Repository Quellen 
 
 https://github.com/junyanz/CycleGAN
+
 https://github.com/aladdinpersson/Machine-Learning-Collection/tree/master/ML/Pytorch/GANs/CycleGAN
+
 https://github.com/aitorzip/PyTorch-CycleGAN
 
 
